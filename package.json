@@ -86,6 +86,7 @@
     "bootstrap/button": "./app/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/button.js",
     "bootstrap/collapse": "./app/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/collapse.js",
     "bootstrap/dropdown": "./app/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/dropdown.js",
+    "bootstrap/modal": "./app/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/modal.js",
     "bootstrap/popover": "./app/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/popover.js",
     "bootstrap/scrollspy": "./app/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/scrollspy.js",
     "bootstrap/tab": "./app/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/tab.js",
