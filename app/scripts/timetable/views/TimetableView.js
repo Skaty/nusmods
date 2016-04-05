@@ -12,6 +12,7 @@ var ShowHideView = require('./ShowHideView');
 var TimetableView = require('./TableView');
 var TipsView = require('./TipsView');
 var UrlSharingView = require('./UrlSharingView');
+var CORSAIView = require('./CORSAIView');
 var config = require('../../common/config');
 var template = require('../templates/timetable.hbs');
 var tips = require('../tips.json');
@@ -28,7 +29,8 @@ module.exports = Marionette.LayoutView.extend({
     showHideRegion: '.show-hide-region',
     timetableRegion: '#timetable-wrapper',
     tipsRegion: '.tips-region',
-    urlSharingRegion: '.url-sharing-region'
+    urlSharingRegion: '.url-sharing-region',
+    corsaiRegion: '.corsai-region'
   },
 
   initialize: function (options) {
@@ -51,6 +53,11 @@ module.exports = Marionette.LayoutView.extend({
       semester: this.semester
     }));
     this.selectRegion.show(new SelectView({
+      semester: this.semester
+    }));
+    this.corsaiRegion.show(new CORSAIView({
+      academicYear: this.academicYear,
+      collection: this.selectedModules,
       semester: this.semester
     }));
     if (this.selectedModules.shared) {
