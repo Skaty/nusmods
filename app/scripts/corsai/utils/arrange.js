@@ -2,6 +2,7 @@
 
 
 var App = require('../../app')
+var _ = require('underscore');
 
 
 module.exports = {
@@ -17,31 +18,51 @@ module.exports = {
     // can call .each on this
     var timetable = selectedModules.timetable;
 
-/* Some attributes
-  ClassNo: "7"
-  DayText:"Tuesday"
-  EndTime:"1800"
-  LessonType:"Lecture"
-  ModuleCode:"LAC1201"
-  ModuleTitle:"Chinese 1"
-  StartTime:"1600"
-  Venue:"AS3-0306"
-  WeekText:"Every Week"
-  color:0
-  dayAbbrev:"tue"
-  dayIndex:1
-  display:true
-  duration:4
-  isDraggable:true
-*/
+    /* Some attributes
+      ClassNo: "7"
+      DayText:"Tuesday"
+      EndTime:"1800"
+      LessonType:"Lecture"
+      ModuleCode:"LAC1201"
+      ModuleTitle:"Chinese 1"
+      StartTime:"1600"
+      Venue:"AS3-0306"
+      WeekText:"Every Week"
+      color:0
+      dayAbbrev:"tue"
+      dayIndex:1
+      display:true
+      duration:4
+      isDraggable:true
+    */
+
+    //console.log(timetable);
 
     timetable.each(function(lesson) {
       console.log(lesson);
     })
 
-    // This unwraps all the collection items
-    var lessons = timetable.models;
+    // Format of the timetable accepted by herbert's algorithm:
 
-    //console.log(selectedModules);
-  }
+    // Array of objects: Each object is a module of a certain lesson type (sectional etc) :
+    // ExamDate: ...
+    // ModuleCode: ...
+    // Timetable: <Array of objects>
+              // Each object is basically a particular class number
+              // ClassNo: ...
+              // LessonType: "Sectional Teaching"
+              // Venue: ...
+              // WeekText: ...
+              // Timings: <Array of objects>
+                      // Each timing object is a module that must be taken for this classno
+                      // DayText: "Tuesday" eg
+                      // EndTime: "1700" eg
+                      // StartTime: "1600" eg
+
+
+    console.log(timetable
+                  .groupBy(function(lesson) { return lesson.get('ModuleCode'); }));
+    },
+
+
 }
