@@ -40,7 +40,8 @@ module.exports = Marionette.ItemView.extend({
                        tightness_selector.val(),
                        lessonbefore_selector.val(),
                        lessonafter_selector.val());
-    // initialize the arrangement
+
+    // begin arranging
     arrange.arrangement();
   }
 

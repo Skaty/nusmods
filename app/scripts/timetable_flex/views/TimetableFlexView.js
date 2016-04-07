@@ -21,7 +21,7 @@ module.exports = Marionette.LayoutView.extend({
     this.model.set('dayAvailability', dayAvailability);
     this.model.set('fiveDayLayout', false);
     _.each(dayAvailability, function (day) {
-      var range = _.map(_.range(timify.convertTimeToIndex('0800'), 
+      var range = _.map(_.range(timify.convertTimeToIndex('0800'),
                                 timify.convertTimeToIndex('2400')), function () {
         return {
           width: 1,
@@ -51,7 +51,7 @@ module.exports = Marionette.LayoutView.extend({
         });
       } else {
         _.each(day.lessons, function (lesson) {
-          
+
           var startIndex = timify.convertTimeToIndex(lesson.StartTime) - eightAmIndex;
           var endIndex = timify.convertTimeToIndex(lesson.EndTime) - eightAmIndex;
           var width = endIndex - startIndex;
@@ -75,7 +75,7 @@ module.exports = Marionette.LayoutView.extend({
         }
       }
       day.timetable = finalRange;
-    });  
+    });
     if (dayAvailability[5].lessons.length === 0) {
       // Remove Saturday if empty
       dayAvailability.splice(5, 1);
@@ -96,7 +96,7 @@ module.exports = Marionette.LayoutView.extend({
         return lesson.StartTime + lesson.EndTime;
       });
 
-      var timeRange = _.range(timify.convertTimeToIndex('0800'), 
+      var timeRange = _.range(timify.convertTimeToIndex('0800'),
                               timify.convertTimeToIndex('2400'));
       var availability = _.object(_.map(timeRange, function (index) {
         return [timify.convertIndexToTime(index), 'vacant'];
