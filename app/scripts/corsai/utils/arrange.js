@@ -6,8 +6,18 @@ var _ = require('underscore');
 
 
 module.exports = {
-  initialize: function(options) {
+  /*
+    initialize accepts 4 arguments:
+      - options: general nusmods options (we mainly care about the current semester)
+      - tightness: arrange-specific - specifies the packing distance between modules
+      - no_before and no_after: a 24hr (2000 for eg) value indicating a preference
+                                for where to constrain lessons to
+  */
+  initialize: function(options, tightness, no_before, no_after) {
     this.semester = options.semester;
+    this.tightness = tightness;
+    this.no_before = no_before;
+    this.no_after = no_after
   },
   arrangement: function() {
     // This returns an object that with .exams returns an ExamCollection

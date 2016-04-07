@@ -30,8 +30,16 @@ module.exports = Marionette.ItemView.extend({
   },
 
   doArrange: function() {
+    // tightness selector
+    var tightness_selector = $("#corsai-tightness")
+    var lessonbefore_selector = $("#corsai-lessonbefore")
+    var lessonafter_selector = $("#corsai-lessonafter")
+
     // pass the current semesters etc to arrange
-    arrange.initialize(this.options);
+    arrange.initialize(this.options,
+                       tightness_selector.val(),
+                       lessonbefore_selector.val(),
+                       lessonafter_selector.val());
     // initialize the arrangement
     arrange.arrangement();
   }
