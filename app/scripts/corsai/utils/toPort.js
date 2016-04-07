@@ -257,7 +257,7 @@ function filterRedundantTimeslots(newerComputationList) {
   var newestComputationList = [];
 
   //foreach module in the computation list
-  newerComputationList.forEach(function(module_with_baggage) {
+    .forEach(function(module_with_baggage) {
     no_clash_timetable = [];
 
     //get the timetable for each module

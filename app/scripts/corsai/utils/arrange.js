@@ -20,6 +20,9 @@ module.exports = {
     this.no_before = no_before;
     this.no_after = no_after
   },
+  groupByLessonTypeAndClassNo: function(modules) {
+
+  },
   arrangement: function() {
     // This returns an object that with .exams returns an ExamCollection
     // and with .timetable returns a LessonCollection
@@ -29,31 +32,39 @@ module.exports = {
     // that have all the relevant information required.
     // Previously these didn't have all the timetable info, just what was selected
     var modules = selectedModules.models;
+
+    console.log("Modules")
+    console.log(modules);
+
+    // Loop through all the modules and group them
     modules.forEach(function(module) {
-      console.log(module);
-      console.log(module.get('Timetable'));
+      //console.log(module);
+      //console.log(module.get('Timetable'));
 
       // Group all modules by their lesson type
       var module_timetable = module.get('Timetable');
-      module.set('Timetable', _.groupBy(module_timetable, 'LessonType'));
-      console.log(module);
+      // convert to array after grouping to keep as array opposed to dictionary
+      module.set('Timetable', _.toArray(_.groupBy(module_timetable, 'LessonType')));
 
-      // Group all lesson-type groups by their class number
-      var updated_module_timetable = module.get('Timetable');
-      for (var lesson_type in updated_module_timetable) {
-        var lessons_by_type = updated_module_timetable[lesson_type];
-        module.get('Timetable')[lesson_type] = _.groupBy(lessons_by_type, 'ClassNo');
-      }
+      // Get the list of modules - but grouped by lessons
+      // [lessontype1, lessontype2..]..
+      //      -> take lessontype1
+      //              -> [classno1, classno2]
+      //                    --> take classno1
+      //                            --> [class1, class2]
+      //          where class1 and class2 are both reqd for this ClassNo
+      var grouped_by_lessons = module.get('Timetable')
 
-      // At this point, each module contains a Timetable field that
-      // a key value pair where the key=Lesson Type (e.g. "Sectional Teaching")
-      // and the value=Object
-      // Value=Object - that object is indexed by the lesson number (e.g. 1) and
-      // the value is an array of objects where each object is a lesson slot,
-      // and each of those lessons are required to be taken for that ClassNo
+      console.log("---module sep start---")
+      grouped_by_lessons = grouped_by_lessons.map(function(classes_by_lesson) {
+        return _.toArray(_.groupBy(classes_by_lesson, 'ClassNo'));
+      });
+      console.log("----module sep----")
 
-      console.log(module);
+      module.set('Timetable', grouped_by_lessons);
 
+      console.log("Final module");
+      console.log(module.get('Timetable'));
 
 
     });
