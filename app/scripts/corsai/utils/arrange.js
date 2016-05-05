@@ -5,6 +5,7 @@ var App = require('../../app')
 var _ = require('underscore');
 var Grouping = require("./grouping")
 var ArrangeModule = require("../models/ArrangeModuleModel")
+var ArrangeModuleCollection = require("../collections/ArrangeModuleCollection")
 
 module.exports = {
   /*
@@ -71,6 +72,7 @@ module.exports = {
 
       var grouped_by_lessons = module.get('Timetable');
 
+      var arrange_modules = new ArrangeModuleCollection();
 
       // After this conversion - every module is into subarrays where each subarrays contains
       // lessons of a particular lesson type.
@@ -94,6 +96,7 @@ module.exports = {
           });
           console.log("Current arrange module");
           console.log(current_arrange_module);
+          arrange_modules.push(current_arrange_module);
         });
       });
 
@@ -107,7 +110,9 @@ module.exports = {
       console.log("----module sep----");
       console.log("");
 
-
+      console.log("ALL ARRANGE MODULES");
+      console.log(arrange_modules);
+      console.log("");
 
     });
 
