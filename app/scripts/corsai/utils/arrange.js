@@ -8,7 +8,10 @@ var Grouping = require("./grouping")
 var ArrangeLessonType = require("../models/ArrangeLessonTypeModel")
 var ArrangeClassNo = require("../models/ArrangeClassNoModel")
 var ArrangeModule = require("../models/ArrangeModuleModel")
+
 var ArrangeModuleCollection = require("../collections/ArrangeModuleCollection")
+var ArrangeLessonTypeCollection = require("../collections/ArrangeLessonTypeCollection")
+var ArrangeClassNoCollection = require("../collections/ArrangeClassNoCollection")
 
 module.exports = {
   /*
@@ -57,18 +60,8 @@ module.exports = {
       // Get some basic attributes of the module
       var moduleCode = module.get('ModuleCode');
 
-      // set the current module object
-      // It should contain the module code and a list of ArrangeLessonType
-      // objects that hold the lesson types for this module and their
-      // associated lessons
-      var current_arrange_module = new ArrangeModule({
-        ModuleCode: moduleCode,
-        ArrangeLessonTypes: []
-      });
-/*
-      console.log("");
-      console.log("---module sep start---");
-*/
+      /* GROUPING SECTION - GROUP TIMETABLE (mutates it) by lesson type and class number */
+
 
       // Group all modules by their lesson type
       var module_timetable = module.get('Timetable');
@@ -77,12 +70,30 @@ module.exports = {
       module.set('Timetable', _.toArray(_.groupBy(module_timetable, 'LessonType')));
 
       var grouped_by_lessons = module.get('Timetable');
+
       // After this conversion - every module is into subarrays where each subarrays contains
       // lessons of a particular lesson type.
       // Each subarray (one lesson type) is separated into subarrays where each subarray
       // contains lessons of a particular class number
       var grouped_by_classno = grouped_by_lessons.map(function(classes_by_lesson) {
         return _.toArray(_.groupBy(classes_by_lesson, 'ClassNo'));
+      });
+
+      /* END GROUPING SECTION - grouped_by_class_no holds the grouped modules */
+
+
+      /*
+        Model-ifying section - puts the modules and slots to be selected and arranged
+        into the correct models and collections
+      */
+
+      // set the current module object
+      // It should contain the module code and a list of ArrangeLessonType
+      // objects that hold the lesson types for this module and their
+      // associated lessons
+      var current_arrange_module = new ArrangeModule({
+        ModuleCode: moduleCode,
+        ArrangeLessonTypes: new ArrangeLessonTypeCollection()
       });
 
 
@@ -96,13 +107,16 @@ module.exports = {
         var current_arrange_lessontype = new ArrangeLessonType({
           ModuleCode: moduleCode,
           LessonType: lesson_type,
-          ArrangeClassNos: []
+          ArrangeClassNos: new ArrangeClassNoCollection()
         });
 
 
         // loop through all class numbers for this module
         all_by_lesson_type.forEach(function(all_by_class_number) {
 
+          // Creates the most informative inner class - the smallest unit of
+          // arrangement - the lessons under a particular module, lesson number
+          // and class number - this group has to be arranged all together.
           var current_arrange_classno_module = new ArrangeClassNo({
             ModuleCode: moduleCode,
             ClassNo: all_by_class_number[0]["ClassNo"],
@@ -110,16 +124,13 @@ module.exports = {
             Lessons: all_by_class_number
           });
 
-          var current_classnos = current_arrange_lessontype.get('ArrangeClassNos');
-
-          current_classnos.push(current_arrange_classno_module);
-          current_arrange_lessontype.set('ArrangeClassNos', current_classnos);
+          // add these to the collection for the overall lesson type
+          current_arrange_lessontype.get('ArrangeClassNos').add(current_arrange_classno_module);
 
         });
 
-        var current_lessontypes = current_arrange_module.get('ArrangeLessonTypes');
-        current_lessontypes.push(current_arrange_lessontype);
-        current_arrange_module.set('ArrangeLessonTypes', current_lessontypes);
+        // add each lesson type and its associated info to the overall module slots
+        current_arrange_module.get('ArrangeLessonTypes').add(current_arrange_lessontype);
 
 
       });
