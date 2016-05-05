@@ -23,7 +23,7 @@ module.exports = {
   groupByLessonTypeAndClassNo: function(modules) {
 
   },
-  arrangement: function() {
+  doArrangement: function() {
     // This returns an object that with .exams returns an ExamCollection
     // and with .timetable returns a LessonCollection
     var selectedModules = App.request('selectedModules', this.semester);
@@ -36,13 +36,23 @@ module.exports = {
     console.log("Modules")
     console.log(modules);
 
+    console.log("");
+    console.log("Starting module loop");
+    console.log("");
+
     // Loop through all the modules and group them
-    modules.forEach(function(module) {
-      //console.log(module);
-      //console.log(module.get('Timetable'));
+    modules.forEach(function(module) {4
+      console.log("Current Module");
+      console.log(module);
+      console.log("Module Timetable");
+      console.log(module.get('Timetable'));
+
+      console.log("");
+      console.log("---module sep start---");
 
       // Group all modules by their lesson type
       var module_timetable = module.get('Timetable');
+
       // convert to array after grouping to keep as array opposed to dictionary
       module.set('Timetable', _.toArray(_.groupBy(module_timetable, 'LessonType')));
 
@@ -53,23 +63,30 @@ module.exports = {
       //                    --> take classno1
       //                            --> [class1, class2]
       //          where class1 and class2 are both reqd for this ClassNo
-      var grouped_by_lessons = module.get('Timetable')
 
-      console.log("---module sep start---")
-      grouped_by_lessons = grouped_by_lessons.map(function(classes_by_lesson) {
+      var grouped_by_lessons = module.get('Timetable');
+
+
+      // After this conversion - every module is into subarrays where each subarrays contains
+      // lessons of a particular lesson type.
+      // Each subarray (one lesson type) is separated into subarrays where each subarray
+      // contains lessons of a particular class number
+      var grouped_by_classno = grouped_by_lessons.map(function(classes_by_lesson) {
         return _.toArray(_.groupBy(classes_by_lesson, 'ClassNo'));
       });
-      console.log("----module sep----")
 
-      module.set('Timetable', grouped_by_lessons);
+
+
+
+      // Update the lesson-grouped timetable
+      module.set('Timetable', grouped_by_classno);
 
       console.log("Final module");
       console.log(module.get('Timetable'));
-
+      console.log("----module sep----");
+      console.log("");
 
     });
-
-
 
 
 

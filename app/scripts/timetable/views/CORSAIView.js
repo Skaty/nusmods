@@ -42,7 +42,7 @@ module.exports = Marionette.ItemView.extend({
                        lessonafter_selector.val());
 
     // begin arranging
-    arrange.arrangement();
+    arrange.doArrangement();
   }
 
 });
