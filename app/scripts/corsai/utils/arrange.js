@@ -41,7 +41,7 @@ module.exports = {
     console.log("");
 
     // Loop through all the modules and group them
-    modules.forEach(function(module) {4
+    modules.forEach(function(module) {
       console.log("Current Module");
       console.log(module);
       console.log("Module Timetable");
