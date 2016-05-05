@@ -4,6 +4,9 @@
 var App = require('../../app')
 var _ = require('underscore');
 var Grouping = require("./grouping")
+
+var ArrangeLessonType = require("../models/ArrangeLessonTypeModel")
+var ArrangeClassNo = require("../models/ArrangeClassNoModel")
 var ArrangeModule = require("../models/ArrangeModuleModel")
 var ArrangeModuleCollection = require("../collections/ArrangeModuleCollection")
 
@@ -41,20 +44,31 @@ module.exports = {
     console.log("Starting module loop");
     console.log("");
 
+    var all_arrange_modules = [];
     // Loop through all the modules and group them
     modules.forEach(function(module) {
+      /*
       console.log("Current Module");
       console.log(module);
       console.log("Module Timetable");
       console.log(module.get('Timetable'));
+      */
 
       // Get some basic attributes of the module
       var moduleCode = module.get('ModuleCode');
 
-
-
+      // set the current module object
+      // It should contain the module code and a list of ArrangeLessonType
+      // objects that hold the lesson types for this module and their
+      // associated lessons
+      var current_arrange_module = new ArrangeModule({
+        ModuleCode: moduleCode,
+        ArrangeLessonTypes: []
+      });
+/*
       console.log("");
       console.log("---module sep start---");
+*/
 
       // Group all modules by their lesson type
       var module_timetable = module.get('Timetable');
@@ -62,18 +76,7 @@ module.exports = {
       // convert to array after grouping to keep as array opposed to dictionary
       module.set('Timetable', _.toArray(_.groupBy(module_timetable, 'LessonType')));
 
-      // Get the list of modules - but grouped by lessons
-      // [lessontype1, lessontype2..]..
-      //      -> take lessontype1
-      //              -> [classno1, classno2]
-      //                    --> take classno1
-      //                            --> [class1, class2]
-      //          where class1 and class2 are both reqd for this ClassNo
-
       var grouped_by_lessons = module.get('Timetable');
-
-      var arrange_modules = new ArrangeModuleCollection();
-
       // After this conversion - every module is into subarrays where each subarrays contains
       // lessons of a particular lesson type.
       // Each subarray (one lesson type) is separated into subarrays where each subarray
@@ -82,39 +85,64 @@ module.exports = {
         return _.toArray(_.groupBy(classes_by_lesson, 'ClassNo'));
       });
 
-      console.log("Grouped By Class Number: ");
-      console.log(grouped_by_classno);
 
       // Create a set of arrange models
+      // loop through all lesson types for this module
       grouped_by_classno.forEach(function(all_by_lesson_type) {
+        var lesson_type = all_by_lesson_type[0][0]["LessonType"];
+
+        // For this lessontype - create an arrange_lessontype model
+        // fill up the class numbers from later
+        var current_arrange_lessontype = new ArrangeLessonType({
+          ModuleCode: moduleCode,
+          LessonType: lesson_type,
+          ArrangeClassNos: []
+        });
+
+
+        // loop through all class numbers for this module
         all_by_lesson_type.forEach(function(all_by_class_number) {
-          var current_arrange_module = new ArrangeModule({
+
+          var current_arrange_classno_module = new ArrangeClassNo({
             ModuleCode: moduleCode,
             ClassNo: all_by_class_number[0]["ClassNo"],
             LessonType: all_by_class_number[0]["LessonType"],
             Lessons: all_by_class_number
           });
-          console.log("Current arrange module");
-          console.log(current_arrange_module);
-          arrange_modules.push(current_arrange_module);
+
+          var current_classnos = current_arrange_lessontype.get('ArrangeClassNos');
+
+          current_classnos.push(current_arrange_classno_module);
+          current_arrange_lessontype.set('ArrangeClassNos', current_classnos);
+
         });
+
+        var current_lessontypes = current_arrange_module.get('ArrangeLessonTypes');
+        current_lessontypes.push(current_arrange_lessontype);
+        current_arrange_module.set('ArrangeLessonTypes', current_lessontypes);
+
+
       });
 
-
+      console.log(current_arrange_module);
 
       // Update the lesson-grouped timetable
-      module.set('Timetable', grouped_by_classno);
+     // module.set('Timetable', grouped_by_classno);
 
-      console.log("Final module");
-      console.log(module.get('Timetable'));
-      console.log("----module sep----");
-      console.log("");
+      //console.log("Final module");
+      //console.log(module.get('Timetable'));
+      //console.log("----module sep----");
+      //console.log("");
 
-      console.log("ALL ARRANGE MODULES");
-      console.log(arrange_modules);
-      console.log("");
+      //console.log("ALL ARRANGE MODULES");
+      //console.log(arrange_modules);
+      //console.log("");
+
+      // add to the overall module collection list
+      //all_arrange_modules.push(arrange_modules);
 
     });
+
 
 
 
