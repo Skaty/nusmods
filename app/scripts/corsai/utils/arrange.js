@@ -4,7 +4,7 @@
 var App = require('../../app')
 var _ = require('underscore');
 var Grouping = require("./grouping")
-
+var ArrangeModule = require("../models/ArrangeModuleModel")
 
 module.exports = {
   /*
@@ -47,6 +47,11 @@ module.exports = {
       console.log("Module Timetable");
       console.log(module.get('Timetable'));
 
+      // Get some basic attributes of the module
+      var moduleCode = module.get('ModuleCode');
+
+
+
       console.log("");
       console.log("---module sep start---");
 
@@ -75,6 +80,22 @@ module.exports = {
         return _.toArray(_.groupBy(classes_by_lesson, 'ClassNo'));
       });
 
+      console.log("Grouped By Class Number: ");
+      console.log(grouped_by_classno);
+
+      // Create a set of arrange models
+      grouped_by_classno.forEach(function(all_by_lesson_type) {
+        all_by_lesson_type.forEach(function(all_by_class_number) {
+          var current_arrange_module = new ArrangeModule({
+            ModuleCode: moduleCode,
+            ClassNo: all_by_class_number[0]["ClassNo"],
+            LessonType: all_by_class_number[0]["LessonType"],
+            Lessons: all_by_class_number
+          });
+          console.log("Current arrange module");
+          console.log(current_arrange_module);
+        });
+      });
 
 
 
@@ -85,6 +106,8 @@ module.exports = {
       console.log(module.get('Timetable'));
       console.log("----module sep----");
       console.log("");
+
+
 
     });
 
