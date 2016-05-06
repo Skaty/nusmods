@@ -29,6 +29,21 @@ module.exports = {
     this.no_after = no_after
   },
 
+  // Groups a module by lessontype and then by class number
+  groupModule: function(module_timetable) {
+    // convert to array after grouping to keep as array opposed to dictionary
+    var grouped_by_lessons = _.toArray(_.groupBy(module_timetable, 'LessonType'));
+
+    // After this conversion - every module is into subarrays where each subarrays contains
+    // lessons of a particular lesson type.
+    // Each subarray (one lesson type) is separated into subarrays where each subarray
+    // contains lessons of a particular class number
+    var grouped_by_classno = grouped_by_lessons.map(function(classes_by_lesson) {
+      return _.toArray(_.groupBy(classes_by_lesson, 'ClassNo'));
+    });
+
+    return grouped_by_classno;
+  },
 
   doArrangement: function() {
     // This returns an object that with .exams returns an ExamCollection
@@ -43,45 +58,26 @@ module.exports = {
     console.log("Modules")
     console.log(modules);
 
-    console.log("");
-    console.log("Starting module loop");
-    console.log("");
-
+    // Overall container for all the arrange-modules we create
     var arrange_modules = new ArrangeModules({
       ArrangeModules: new ArrangeModuleCollection()
     });
 
-    // Loop through all the modules and group them
+    // Keeps external context
+    var arrangeThis = this;
+
+    // Loop through all the modules
     modules.forEach(function(module) {
-      /*
-      console.log("Current Module");
-      console.log(module);
-      console.log("Module Timetable");
-      console.log(module.get('Timetable'));
-      */
 
       // Get some basic attributes of the module
       var moduleCode = module.get('ModuleCode');
-
-      /* GROUPING SECTION - GROUP TIMETABLE by lesson type and class number */
-
-
-      // Group all modules by their lesson type
       var module_timetable = module.get('Timetable');
 
-      // convert to array after grouping to keep as array opposed to dictionary
-      var grouped_by_lessons = _.toArray(_.groupBy(module_timetable, 'LessonType'));
-
-      // After this conversion - every module is into subarrays where each subarrays contains
-      // lessons of a particular lesson type.
-      // Each subarray (one lesson type) is separated into subarrays where each subarray
-      // contains lessons of a particular class number
-      var grouped_by_classno = grouped_by_lessons.map(function(classes_by_lesson) {
-        return _.toArray(_.groupBy(classes_by_lesson, 'ClassNo'));
-      });
-
-      /* END GROUPING SECTION - grouped_by_class_no holds the grouped modules */
-
+      // Group all modules by their lesson type
+      // calls function "groupModule"
+      // called through external context arrangeThis because we are
+      // in a forEach
+      var grouped_by_classno = arrangeThis.groupModule(module_timetable);
 
       /*
         Model-ifying section - puts the modules and slots to be selected and arranged
@@ -143,6 +139,11 @@ module.exports = {
     console.log(arrange_modules);
 
     console.log("Current Number of Permutations: " + arrange_modules.permutations());
+
+
+    // Need to cut down the slots that are repeated
+
+
 
     // Format of the timetable accepted by herbert's algorithm:
 
