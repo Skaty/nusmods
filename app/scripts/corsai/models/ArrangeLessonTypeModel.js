@@ -29,6 +29,20 @@ module.exports = Backbone.Model.extend({
     } else {
       return this.get('ArrangeClassNos').length;
     }
+  },
+
+  /*
+    Looks at all the class numbers and removes those
+    that are redundant - i.e. the only thing that differs
+    is the venue
+  */
+  removeRedundantLessons: function() {
+    if (this.get('ArrangeClassNos') == null) {
+      return 0;
+    } else {
+      var classNos = this.get('ArrangeClassNos');
+      console.log(classNos);
+    }
   }
 
 });

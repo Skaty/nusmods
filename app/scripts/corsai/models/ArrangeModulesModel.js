@@ -10,7 +10,7 @@ var Backbone = require('backbone');
 module.exports = Backbone.Model.extend({
 
   initialize: function () {
-    ArrangeModules: null
+    ArrangeModules: null;
   },
 
   /*
@@ -24,7 +24,21 @@ module.exports = Backbone.Model.extend({
     } else {
       return this.get('ArrangeModules').reduce(function(memo, module) {
         return memo * module.permutations();
-      }, 1)
+      }, 1);
+    }
+  },
+
+  /*
+    Recursively removes redundant lessons for each module.
+    Mutates the internal lists to do this
+  */
+  removeRedundantLessons: function() {
+    if (this.get('ArrangeModules') == null) {
+      return 0;
+    } else {
+      return this.get('ArrangeModules').each(function(module) {
+        module.removeRedundantLessons();
+      });
     }
   }
 

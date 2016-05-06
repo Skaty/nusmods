@@ -26,9 +26,23 @@ module.exports = Backbone.Model.extend({
     if (this.get('ArrangeLessonTypes') == null) {
       return 0;
     } else {
-      return this.get('ArrangeLessonTypes').reduce(function(memo, lesson_type) {
-        return memo * lesson_type.permutations();
-      }, 1)
+      return this.get('ArrangeLessonTypes').reduce(function(memo, lessonType) {
+        return memo * lessonType.permutations();
+      }, 1);
+    }
+  },
+
+  /*
+    Recursively removes redundant lessons for each lesson type.
+    Mutates the internal lists to do this
+  */
+  removeRedundantLessons: function() {
+    if (this.get('ArrangeLessonTypes') == null) {
+      return 0;
+    } else {
+      return this.get('ArrangeLessonTypes').each(function(lessonType) {
+        lessonType.removeRedundantLessons();
+      });
     }
   }
 

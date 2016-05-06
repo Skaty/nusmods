@@ -1,18 +1,18 @@
 'use strict';
 
 
-var App = require('../../app')
+var App = require('../../app');
 var _ = require('underscore');
-var Grouping = require("./grouping")
+var Grouping = require('./grouping');
 
-var ArrangeLessonType = require("../models/ArrangeLessonTypeModel")
-var ArrangeClassNo = require("../models/ArrangeClassNoModel")
-var ArrangeModule = require("../models/ArrangeModuleModel")
-var ArrangeModules = require("../models/ArrangeModulesModel")
+var ArrangeLessonType = require('../models/ArrangeLessonTypeModel');
+var ArrangeClassNo = require('../models/ArrangeClassNoModel');
+var ArrangeModule = require('../models/ArrangeModuleModel');
+var ArrangeModules = require('../models/ArrangeModulesModel');
 
-var ArrangeModuleCollection = require("../collections/ArrangeModuleCollection")
-var ArrangeLessonTypeCollection = require("../collections/ArrangeLessonTypeCollection")
-var ArrangeClassNoCollection = require("../collections/ArrangeClassNoCollection")
+var ArrangeModuleCollection = require('../collections/ArrangeModuleCollection');
+var ArrangeLessonTypeCollection = require('../collections/ArrangeLessonTypeCollection');
+var ArrangeClassNoCollection = require('../collections/ArrangeClassNoCollection');
 
 module.exports = {
   /*
@@ -22,27 +22,27 @@ module.exports = {
       - no_before and no_after: a 24hr (2000 for eg) value indicating a preference
                                 for where to constrain lessons to
   */
-  initialize: function(options, tightness, no_before, no_after) {
+  initialize: function(options, tightness, noBefore, noAfter) {
     this.semester = options.semester;
     this.tightness = tightness;
-    this.no_before = no_before;
-    this.no_after = no_after
+    this.noBefore = noBefore;
+    this.noAfter = noAfter;
   },
 
   // Groups a module by lessontype and then by class number
-  groupModule: function(module_timetable) {
+  groupModule: function(moduleTimetable) {
     // convert to array after grouping to keep as array opposed to dictionary
-    var grouped_by_lessons = _.toArray(_.groupBy(module_timetable, 'LessonType'));
+    var groupedByLessons = _.toArray(_.groupBy(moduleTimetable, 'LessonType'));
 
     // After this conversion - every module is into subarrays where each subarrays contains
     // lessons of a particular lesson type.
     // Each subarray (one lesson type) is separated into subarrays where each subarray
     // contains lessons of a particular class number
-    var grouped_by_classno = grouped_by_lessons.map(function(classes_by_lesson) {
-      return _.toArray(_.groupBy(classes_by_lesson, 'ClassNo'));
+    var groupedByClassno = groupedByLessons.map(function(classesByLesson) {
+      return _.toArray(_.groupBy(classesByLesson, 'ClassNo'));
     });
 
-    return grouped_by_classno;
+    return groupedByClassno;
   },
 
   doArrangement: function() {
@@ -55,11 +55,11 @@ module.exports = {
     // Previously these didn't have all the timetable info, just what was selected
     var modules = selectedModules.models;
 
-    console.log("Modules")
+    console.log('Modules');
     console.log(modules);
 
     // Overall container for all the arrange-modules we create
-    var arrange_modules = new ArrangeModules({
+    var arrangeModules = new ArrangeModules({
       ArrangeModules: new ArrangeModuleCollection()
     });
 
@@ -71,13 +71,13 @@ module.exports = {
 
       // Get some basic attributes of the module
       var moduleCode = module.get('ModuleCode');
-      var module_timetable = module.get('Timetable');
+      var moduleTimetable = module.get('Timetable');
 
       // Group all modules by their lesson type
       // calls function "groupModule"
       // called through external context arrangeThis because we are
       // in a forEach
-      var grouped_by_classno = arrangeThis.groupModule(module_timetable);
+      var groupedByClassno = arrangeThis.groupModule(moduleTimetable);
 
       /*
         Model-ifying section - puts the modules and slots to be selected and arranged
@@ -88,7 +88,7 @@ module.exports = {
       // It should contain the module code and a list of ArrangeLessonType
       // objects that hold the lesson types for this module and their
       // associated lessons
-      var current_arrange_module = new ArrangeModule({
+      var currentArrangeModule = new ArrangeModule({
         ModuleCode: moduleCode,
         ArrangeLessonTypes: new ArrangeLessonTypeCollection()
       });
@@ -96,53 +96,53 @@ module.exports = {
 
       // Create a set of arrange models
       // loop through all lesson types for this module
-      grouped_by_classno.forEach(function(all_by_lesson_type) {
-        var lesson_type = all_by_lesson_type[0][0]["LessonType"];
+      groupedByClassno.forEach(function(allByLessonType) {
+        var lessonType = allByLessonType[0][0].LessonType;
 
         // For this lessontype - create an arrange_lessontype model
         // fill up the class numbers from later
-        var current_arrange_lessontype = new ArrangeLessonType({
+        var currentArrangeLessontype = new ArrangeLessonType({
           ModuleCode: moduleCode,
-          LessonType: lesson_type,
+          LessonType: lessonType,
           ArrangeClassNos: new ArrangeClassNoCollection()
         });
 
 
         // loop through all class numbers for this module
-        all_by_lesson_type.forEach(function(all_by_class_number) {
+        allByLessonType.forEach(function(allByClassNumber) {
 
           // Creates the most informative inner class - the smallest unit of
           // arrangement - the lessons under a particular module, lesson number
           // and class number - this group has to be arranged all together.
-          var current_arrange_classno_module = new ArrangeClassNo({
+          var currentArrangeClassnoModule = new ArrangeClassNo({
             ModuleCode: moduleCode,
-            ClassNo: all_by_class_number[0]["ClassNo"],
-            LessonType: all_by_class_number[0]["LessonType"],
-            Lessons: all_by_class_number
+            ClassNo: allByClassNumber[0].ClassNo,
+            LessonType: allByClassNumber[0].LessonType,
+            Lessons: allByClassNumber
           });
 
           // add these to the collection for the overall lesson type
-          current_arrange_lessontype.get('ArrangeClassNos').add(current_arrange_classno_module);
+          currentArrangeLessontype.get('ArrangeClassNos').add(currentArrangeClassnoModule);
 
         });
 
         // add each lesson type and its associated info to the overall module slots
-        current_arrange_module.get('ArrangeLessonTypes').add(current_arrange_lessontype);
+        currentArrangeModule.get('ArrangeLessonTypes').add(currentArrangeLessontype);
 
 
       });
       // add the module and its associated lessons to the overall collection module
-      arrange_modules.get("ArrangeModules").add(current_arrange_module);
+      arrangeModules.get('ArrangeModules').add(currentArrangeModule);
     });
 
-    console.log("All arrange modules");
-    console.log(arrange_modules);
+    console.log('All arrange modules');
+    console.log(arrangeModules);
 
-    console.log("Current Number of Permutations: " + arrange_modules.permutations());
+    console.log('Current Number of Permutations: ' + arrangeModules.permutations());
 
 
     // Need to cut down the slots that are repeated
-
+    arrangeModules.removeRedundantLessons();
 
 
     // Format of the timetable accepted by herbert's algorithm:
@@ -170,4 +170,4 @@ module.exports = {
     }
 
 
-}
+};
