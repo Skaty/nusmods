@@ -8,9 +8,9 @@ module.exports = Backbone.Collection.extend({
   model: Exam,
 
   initialize: function () {
-    this.clashCount = 0; 
+    this.clashCount = 0;
     this.listenTo(this, {
-      add: this.onAdd, 
+      add: this.onAdd,
       remove: this.onRemove
     });
   },
@@ -57,7 +57,7 @@ module.exports = Backbone.Collection.extend({
   },
 
   // Sort by custom key: if have exam, month then date then clustered hour,
-  // if not, sort alphabetically by code. Modules without exams will be 
+  // if not, sort alphabetically by code. Modules without exams will be
   // displayed before those with exams.
   comparator: function(exam) {
     return exam.get('key');

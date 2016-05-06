@@ -8,6 +8,7 @@ var Grouping = require("./grouping")
 var ArrangeLessonType = require("../models/ArrangeLessonTypeModel")
 var ArrangeClassNo = require("../models/ArrangeClassNoModel")
 var ArrangeModule = require("../models/ArrangeModuleModel")
+var ArrangeModules = require("../models/ArrangeModulesModel")
 
 var ArrangeModuleCollection = require("../collections/ArrangeModuleCollection")
 var ArrangeLessonTypeCollection = require("../collections/ArrangeLessonTypeCollection")
@@ -47,7 +48,10 @@ module.exports = {
     console.log("Starting module loop");
     console.log("");
 
-    var all_arrange_modules = [];
+    var arrange_modules = new ArrangeModules({
+      ArrangeModules: new ArrangeModuleCollection()
+    });
+
     // Loop through all the modules and group them
     modules.forEach(function(module) {
       /*
@@ -60,16 +64,14 @@ module.exports = {
       // Get some basic attributes of the module
       var moduleCode = module.get('ModuleCode');
 
-      /* GROUPING SECTION - GROUP TIMETABLE (mutates it) by lesson type and class number */
+      /* GROUPING SECTION - GROUP TIMETABLE by lesson type and class number */
 
 
       // Group all modules by their lesson type
       var module_timetable = module.get('Timetable');
 
       // convert to array after grouping to keep as array opposed to dictionary
-      module.set('Timetable', _.toArray(_.groupBy(module_timetable, 'LessonType')));
-
-      var grouped_by_lessons = module.get('Timetable');
+      var grouped_by_lessons = _.toArray(_.groupBy(module_timetable, 'LessonType'));
 
       // After this conversion - every module is into subarrays where each subarrays contains
       // lessons of a particular lesson type.
@@ -134,29 +136,14 @@ module.exports = {
 
 
       });
-
-      console.log(current_arrange_module);
-
-      // Update the lesson-grouped timetable
-     // module.set('Timetable', grouped_by_classno);
-
-      //console.log("Final module");
-      //console.log(module.get('Timetable'));
-      //console.log("----module sep----");
-      //console.log("");
-
-      //console.log("ALL ARRANGE MODULES");
-      //console.log(arrange_modules);
-      //console.log("");
-
-      // add to the overall module collection list
-      //all_arrange_modules.push(arrange_modules);
-
+      // add the module and its associated lessons to the overall collection module
+      arrange_modules.get("ArrangeModules").add(current_arrange_module);
     });
 
+    console.log("All arrange modules");
+    console.log(arrange_modules);
 
-
-
+    console.log(arrange_modules.permutations());
 
     // Format of the timetable accepted by herbert's algorithm:
 
