@@ -3,7 +3,6 @@
 
 var App = require('../../app');
 var _ = require('underscore');
-var Grouping = require('./grouping');
 
 var ArrangeLessonType = require('../models/ArrangeLessonTypeModel');
 var ArrangeClassNo = require('../models/ArrangeClassNoModel');
@@ -144,6 +143,8 @@ module.exports = {
     arrangeModules.removeRedundantLessons();
 
     console.log('Latest Number of Permutations: ' + arrangeModules.permutations());
+
+
 
     // Format of the timetable accepted by herbert's algorithm:
 

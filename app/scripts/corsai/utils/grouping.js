@@ -15,7 +15,7 @@ module.exports = {
 
     return Object.keys(groups).map(function(group){
       return groups[group];
-    })
+    });
   },
 
   groupByClassNo: function(timetable) {
@@ -29,4 +29,4 @@ module.exports = {
   }
 
 
-}
+};
