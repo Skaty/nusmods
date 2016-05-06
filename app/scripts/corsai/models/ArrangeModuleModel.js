@@ -18,13 +18,15 @@ module.exports = Backbone.Model.extend({
 
   },
 
+  /*
+    From main entry point for permutations in ArrangeModulesModel -
+    recurses to here to calculate permutations for all the lesson types
+  */
   permutations: function() {
     if (this.get('ArrangeLessonTypes') == null) {
-      console.log("undefined ArrangeLessonTypes");
       return 0;
     } else {
       return this.get('ArrangeLessonTypes').reduce(function(memo, lesson_type) {
-        console.log("Lesson_type perm: " + lesson_type.permutations());
         return memo * lesson_type.permutations();
       }, 1)
     }

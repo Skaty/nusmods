@@ -18,12 +18,15 @@ module.exports = Backbone.Model.extend({
 
   },
 
+  /*
+    End-point for permutation calculations - just returns
+    the number of classes - will be multiplied later to get
+    the overall number of permutations
+  */
   permutations: function() {
     if (this.get('ArrangeClassNos') == null) {
-      console.log("undefined ArrangeClassNos");
       return 0;
     } else {
-      console.log("Class Nos Length: " + this.get('ArrangeClassNos').length)
       return this.get('ArrangeClassNos').length;
     }
   }

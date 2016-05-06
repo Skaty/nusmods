@@ -13,13 +13,16 @@ module.exports = Backbone.Model.extend({
     ArrangeModules: null
   },
 
+  /*
+    Main entry point for calling permutations: calculates
+    the number of permutations for all of the lessons under this
+    set of modules
+  */
   permutations: function() {
     if (this.get('ArrangeModules') == null) {
-      console.log("undefined arrangemodules");
       return 0;
     } else {
       return this.get('ArrangeModules').reduce(function(memo, module) {
-        console.log("Module perm: " + module.permutations());
         return memo * module.permutations();
       }, 1)
     }

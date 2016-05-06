@@ -28,9 +28,8 @@ module.exports = {
     this.no_before = no_before;
     this.no_after = no_after
   },
-  groupByLessonTypeAndClassNo: function(modules) {
 
-  },
+
   doArrangement: function() {
     // This returns an object that with .exams returns an ExamCollection
     // and with .timetable returns a LessonCollection
@@ -143,7 +142,7 @@ module.exports = {
     console.log("All arrange modules");
     console.log(arrange_modules);
 
-    console.log(arrange_modules.permutations());
+    console.log("Current Number of Permutations: " + arrange_modules.permutations());
 
     // Format of the timetable accepted by herbert's algorithm:
 
