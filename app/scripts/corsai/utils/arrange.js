@@ -138,12 +138,12 @@ module.exports = {
     console.log('All arrange modules');
     console.log(arrangeModules);
 
-    console.log('Current Number of Permutations: ' + arrangeModules.permutations());
-
+    console.log('Original Number of Permutations: ' + arrangeModules.permutations());
 
     // Need to cut down the slots that are repeated
     arrangeModules.removeRedundantLessons();
 
+    console.log('Latest Number of Permutations: ' + arrangeModules.permutations());
 
     // Format of the timetable accepted by herbert's algorithm:
 
